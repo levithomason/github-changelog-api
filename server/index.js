@@ -15,10 +15,6 @@ app
       )
   })
 
-  .all('*', (req, res) => {
-    res.redirect('/')
-  })
-
 const server = app.listen(process.env.PORT || 3000, () => {
   const {host = 'localhost', port} = server.address()
   console.log(`listening at http://${host}:${port}`)
