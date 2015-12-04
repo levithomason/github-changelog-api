@@ -1,18 +1,21 @@
 import express from 'express'
-import changelog from './changelog'
+import changelog from './Changelog'
+import ChangeLogError from './ChangeLogError';
 
 const app = express()
 
 app
   .get('/:user/:repo', (req, res) => {
-    // first try to read it
-    // on error, generate it, then read it again
-    changelog.readHTML(req.params.user, req.params.repo)
-      .then(data => res.send(data))
-      .catch(err => changelog.generateHTML(req.params.user, req.params.repo)
-        .then(data => res.send(data))
-        .catch(err => res.status(500).send(err))
-      )
+    const {user, repo} = req.params;
+    const isHTML = req.query.html !== undefined;
+
+    changelog.get(user, repo, isHTML)
+      .then(data => res.set('Content-Type', 'text/plain; charset=utf-8').send(data))
+      .catch(err => {
+        res
+          .status(400)
+          .send(new ChangeLogError(`Could not get a changelog for ${user}/${repo}`))
+      })
   })
 
 const server = app.listen(process.env.PORT || 3000, () => {
