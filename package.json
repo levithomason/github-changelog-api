@@ -1,7 +1,7 @@
 {
-  "name": "github-changelog",
+  "name": "github-changelog-api",
   "version": "1.0.0",
-  "description": "Changelog generator service for GitHub projects.",
+  "description": "Changelog generator API for GitHub projects.",
   "main": "dist/index.html",
   "scripts": {
     "start": "nodemon --exec babel-node -- server/index.js"
