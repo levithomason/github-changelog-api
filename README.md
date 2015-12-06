@@ -6,11 +6,11 @@ An API for generating a changelog with the excellent [GitHub Changelog Generator
 ## API
 
 **Markdown**
->GET
+>GET  
 >https://github-changelog-api.herokuapp.com/:user/:repo
 
 **Html**
->GET
+>GET  
 >https://github-changelog-api.herokuapp.com/:user/:repo?html
 
 ## Credits
