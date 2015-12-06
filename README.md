@@ -11,7 +11,7 @@ An API for generating a changelog with the excellent [GitHub Changelog Generator
 
 **Html**
 >GET
->https://github-changelog-api.herokuapp.com/:user/:repo?html=true
+>https://github-changelog-api.herokuapp.com/:user/:repo?html
 
 ## Credits
 
