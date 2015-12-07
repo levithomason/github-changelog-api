@@ -6,17 +6,20 @@ I use it for CI/CD.
 
 ## API
 
-**Markdown**
->GET - Retreive a changelog
->https://github-changelog-api.herokuapp.com/:user/:repo
->
->POST - Creates a changelog
->https://github-changelog-api.herokuapp.com/:user/:repo
+### Create
 
+>POST  
+>https://github-changelog-api.herokuapp.com/:user/:repo  
+>Response: markdown (plain text)
 
-**Html**
+### Read Markdown
+
 >GET  
->https://github-changelog-api.herokuapp.com/:user/:repo?html
+>https://github-changelog-api.herokuapp.com/:user/:repo  
+
+### Read Html
+>GET  
+>https://github-changelog-api.herokuapp.com/:user/:repo?html  
 
 ## Contribute
 
