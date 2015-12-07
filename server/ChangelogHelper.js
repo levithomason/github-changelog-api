@@ -4,7 +4,7 @@ import fs from 'fs'
 import redisClient from './RedisClient'
 import {ChangelogModel} from './Models'
 
-import {CHANGELOG_DIR, CHANGELOG_GITHUB_TOKEN, PROJECT_ROOT, REDIS_EXPIRY} from './Config'
+import {CHANGELOG_DIR, PROJECT_ROOT, REDIS_EXPIRY} from './Config'
 
 Promise.promisifyAll(cp)
 Promise.promisifyAll(fs)
@@ -74,7 +74,7 @@ class ChangelogHelper {
     }
     const generateChangelog = () => {
       console.log(`...GENERATING CHANGELOG: ${this.ghPath} in ${this.relPath}`)
-      return cp.execAsync(`github_changelog_generator -t ${CHANGELOG_GITHUB_TOKEN} -u ${this.user} -p ${this.repo}`, {
+      return cp.execAsync(`github_changelog_generator ${this.ghPath}`, {
         cwd: this.relPath
       })
     }

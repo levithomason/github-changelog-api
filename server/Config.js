@@ -8,11 +8,6 @@ export const SERVER_ROOT = `${PROJECT_ROOT}/dist`
 export const CHANGELOG_DIR = 'changelogs'
 
 //
-// GitHub Changelog Generator
-//
-export const CHANGELOG_GITHUB_TOKEN = process.env.CHANGELOG_GITHUB_TOKEN || 'd1ecab01464d07cc63d318344c15031bdb6a60a5'
-
-//
 // Redis
 //
 export const REDIS_EXPIRY = 1000 * 60 * 60 * 24 * 5 // 5 days
