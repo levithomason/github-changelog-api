@@ -7,8 +7,12 @@ I use it for CI/CD.
 ## API
 
 **Markdown**
->GET  
+>GET - Retreive a changelog
 >https://github-changelog-api.herokuapp.com/:user/:repo
+>
+>POST - Creates a changelog
+>https://github-changelog-api.herokuapp.com/:user/:repo
+
 
 **Html**
 >GET  
