@@ -2,7 +2,7 @@ import express from 'express'
 import marked from 'marked';
 import morgan from 'morgan';
 
-import changelog from './Changelog'
+import ChangelogHelper from './ChangelogHelper'
 import ChangeLogError from './ChangeLogError'
 const app = express()
 
@@ -11,46 +11,35 @@ app.use(morgan('dev', {
 }))
 
 app
+  .post('/:user/:repo', (req, res) => {
+    const {user, repo} = req.params
+    const changelog = new ChangelogHelper(user, repo)
+
+    changelog.generate()
+      .then(data => {
+        res.set('Content-Type', `text/plain; charset=utf-8`).send(data)
+      }, err => {
+        const error = new ChangeLogError(`Could not generate changelog for /${user}/${repo}. Does the repo exist?`, err)
+        res.status(400).json(error)
+      })
+  })
+
   .get('/:user/:repo', (req, res) => {
     const {user, repo} = req.params
     const isHTML = req.query.html !== undefined;
+    const changelog = new ChangelogHelper(user, repo)
 
-    function success(data) {
-      res
-        .set('Content-Type', `text/plain; charset=utf-8`)
-        .send(isHTML ? marked(data) : data)
-    }
-
-    function fail(err) {
-      res
-        .status(400)
-        .json(new ChangeLogError(`Could not generate a changelog for ${user}/${repo}.  Does the repo exist?`, err))
-    }
-
-    changelog.read(user, repo)
-      .then(res => {
-        success(res)
+    changelog.read()
+      .then(data => {
+        res.set('Content-Type', `text/plain; charset=utf-8`).send(isHTML ? marked(data) : data)
       }, err => {
-        console.log('...READ ERROR, GENERATING')
-        return changelog.generate(user, repo)
-          .then(res => {
-            console.log('...GENERATED ...READING')
-            return changelog.read(user, repo)
-          })
-          .then(res => {
-            console.log('...READ SUCCESS')
-            success(res)
-          })
-          .catch(err => {
-            console.log(err.toString())
-            fail(err)
-          })
+        const error = new ChangeLogError(`No changelog found for ${user}/${repo}. POST to generate one.`, err)
+        res.status(400).json(error)
       })
   })
+
   .all('*', (req, res) => {
-    res
-      .status(400)
-      .json(new ChangeLogError(`Bad url parameters, usage: /:user/:repo`))
+    res.status(400).json(new ChangeLogError(`Bad url parameters, usage: /:user/:repo`))
   })
 
 const server = app.listen(process.env.PORT || 3000, () => {

@@ -4,7 +4,16 @@
   "description": "Changelog generator API for GitHub projects.",
   "main": "dist/index.html",
   "scripts": {
-    "start": "nodemon --exec babel-node -- server/index.js"
+    "clean": "while read line; do rm -rf $line; done < .gitignore",
+    "stop": "npm run mongo:stop & npm run redis:stop",
+    "prestart": "npm run mongo:start && npm run redis:start",
+    "start": "nodemon --exec babel-node -- server/index.js",
+    "premongo:start": "npm run mongo:stop",
+    "mongo:start": "mkdir -p ./db && mongod --dbpath ./db --fork --logpath /dev/null",
+    "mongo:stop": "mongo admin --eval 'db.shutdownServer()' > /dev/null 2>&1 || exit 0",
+    "preredis:start": "npm run redis:stop",
+    "redis:start": "bash ./scripts/subshell_redis.sh",
+    "redis:stop": "redis-cli shutdown > /dev/null 2>&1 || exit 0"
   },
   "engines": {
     "node": "5.1.0",
@@ -25,6 +34,7 @@
     "history": "^1.13.0",
     "html-webpack-plugin": "^1.6.2",
     "marked": "^0.3.5",
+    "mongoose": "^4.2.9",
     "morgan": "^1.6.1",
     "nodemon": "^1.8.1",
     "react": "^0.14.0",

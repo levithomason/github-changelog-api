@@ -1,4 +1,15 @@
+# Heads Up!
+#
+# npm run clean passes each line in this file to 'rm -rf'
+#
+
 *.log
 changelogs/
 dist/
 node_modules/
+
+# redis
+dump.rdb
+
+# mongodb
+db/
