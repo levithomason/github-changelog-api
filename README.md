@@ -17,7 +17,7 @@ Generates a changelog to date, overwriting any previous.
 ### Retrieve
 
 >GET  
->https://github-changelog-api.herokuapp.com/:user/:repo
+>https://github-changelog-api.herokuapp.com/:user/:repo  
 >**Response:** Markdown
 
 ### Query Params
