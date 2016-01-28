@@ -27,11 +27,18 @@ app
   .get('/:user/:repo', (req, res) => {
     const {user, repo} = req.params
     const isHTML = req.query.html !== undefined;
+    const isJSON = req.query.json !== undefined;
     const changelog = new ChangelogHelper(user, repo)
 
     changelog.read()
       .then(data => {
-        res.set('Content-Type', `text/plain; charset=utf-8`).send(isHTML ? marked(data) : data)
+        let response = data.contents
+        if (isJSON) {
+          response = data
+        } else if (isHTML) {
+          response = marked(data.contents)
+        }
+        res.set('Content-Type', `text/plain; charset=utf-8`).send(response)
       }, err => {
         const error = new ChangeLogError(`No changelog found for ${user}/${repo}. POST to generate one.`, err)
         res.status(400).json(error)

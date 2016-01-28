@@ -98,7 +98,11 @@ class ChangelogHelper {
     return this.getCache()
       .then(res => {
         console.log(res ? '...CACHE IS GOOD' : `...CACHE IS BAD: ${res}`)
-        return res || this.getFromStorage()
+        try {
+          return res ? JSON.parse(res) : this.getFromStorage()
+        } catch (e) {
+          return this.getFromStorage()
+        }
       })
   }
 }

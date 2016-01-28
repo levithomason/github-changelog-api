@@ -8,18 +8,25 @@ I use it for CI/CD.
 
 ### Create
 
+Generates a changelog to date, overwriting any previous. 
+
 >POST  
 >https://github-changelog-api.herokuapp.com/:user/:repo  
->Response: markdown (plain text)
+>**Response:** Markdown
 
-### Read Markdown
+### Retrieve
 
 >GET  
->https://github-changelog-api.herokuapp.com/:user/:repo  
+>https://github-changelog-api.herokuapp.com/:user/:repo
+>**Response:** Markdown
 
-### Read Html
->GET  
->https://github-changelog-api.herokuapp.com/:user/:repo?html  
+### Query Params
+
+HTML formatted:
+>?html
+
+Full JSON model:
+>?json
 
 ## Contribute
 
