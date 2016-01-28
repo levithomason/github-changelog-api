@@ -17,7 +17,7 @@ app
 
     changelog.generate()
       .then(data => {
-        res.set('Content-Type', `text/plain; charset=utf-8`).send(data)
+        res.set('Content-Type', `text/plain; charset=utf-8`).send(data.contents)
       }, err => {
         const error = new ChangeLogError(`Could not generate changelog for /${user}/${repo}. Does the repo exist?`, err)
         res.status(400).json(error)
