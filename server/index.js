@@ -19,7 +19,11 @@ app
       .then(data => {
         res.set('Content-Type', `text/plain; charset=utf-8`).send(data)
       }, err => {
-        const error = new ChangeLogError(`Could not generate changelog for /${user}/${repo}. Does the repo exist?`, err)
+        const error = new ChangeLogError(
+          `Could not generate changelog for /${user}/${repo}.` +
+          ` Ensure the repo exists. If it's private, please use a valid access token.`,
+          err
+        )
         res.status(400).json(error)
       })
   })
