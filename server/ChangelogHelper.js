@@ -1,9 +1,9 @@
 import Promise from 'bluebird'
 import cp from 'child_process'
 import fs from 'fs'
+import marked from 'marked';
 import redisClient from './RedisClient'
 import {ChangelogModel} from './Models'
-
 import {CHANGELOG_DIR, PROJECT_ROOT, REDIS_EXPIRY} from './Config'
 
 Promise.promisifyAll(cp)
@@ -56,9 +56,9 @@ class ChangelogHelper {
     })
   }
 
-  saveToStorage(contents) {
+  saveToStorage(md) {
     console.log(`...SAVING TO STORAGE: ${this.ghPath}`)
-    const log = new ChangelogModel({user: this.user, repo: this.repo, contents})
+    const log = new ChangelogModel({user: this.user, repo: this.repo, md, html: marked(md)})
     return log.save()
       .then(model => this.setCache(model))
   }
@@ -67,16 +67,16 @@ class ChangelogHelper {
    * Write CHANGELOG.md to disk, sync to s3, and set in redis
    * @returns {Promise}
    */
-  generate() {
+  generate(token) {
     const mkdir = () => {
       console.log(`...MAKING DIRECTORY: ${this.relPath}`)
       return cp.execAsync(`mkdir -p ${this.relPath}`)
     }
     const generateChangelog = () => {
       console.log(`...GENERATING CHANGELOG: ${this.ghPath} in ${this.relPath}`)
-      return cp.execAsync(`github_changelog_generator ${this.ghPath}`, {
-        cwd: this.relPath
-      })
+      let command = `github_changelog_generator ${this.ghPath}`
+      if (token) command += ` -t ${token}`
+      return cp.execAsync(command, {cwd: this.relPath})
     }
     const readFromDisk = () => {
       console.log(`...READING FROM DISK: ${this.absPath}/CHANGELOG.md`)
@@ -86,7 +86,12 @@ class ChangelogHelper {
     return mkdir()
       .then(res => generateChangelog())
       .then(res => readFromDisk())
-      .then(md => this.saveToStorage(md))
+      .then(md => {
+        // users provided tokens for private repo access
+        // if provided, skip storage and return md
+        // else store result and return only the markdown
+        return token ? md : this.saveToStorage(md).then(res => res.md)
+      })
   }
 
   /**
