@@ -4,37 +4,43 @@ GitHub Changelog API
 An API for generating a changelog with the excellent [GitHub Changelog Generator](https://github.com/skywinder/github-changelog-generator).
 I use it for CI/CD.
 
-## API
+## Usage
 
 ### Create
 
-Generates a changelog to date, overwriting any previous. 
-
->POST  
->https://github-changelog-api.herokuapp.com/:user/:repo  
->**Response:** Markdown
+```bash
+curl -X POST github-changelog-api.herokuapp.com/:user/:repo > CHANGELOG.md
+```
 
 ### Retrieve
 
->GET  
->https://github-changelog-api.herokuapp.com/:user/:repo  
->**Response:** Markdown
+```bash
+curl github-changelog-api.herokuapp.com/:user/:repo > CHANGELOG.md
+```
 
-### Private Repo?
+## Private Repo?
 
 [Generate a token here](https://github.com/settings/tokens/new?description=GitHub%20Changelog%20API%20token)
 and pass it as a query param `?token=<your_token>`.  This will skip storage and cache as well.
 
-### Query Params
+```bash
+curl -X POST github-changelog-api.herokuapp.com/:user/:repo?token=123 > CHANGELOG.md
+```
 
-GitHub Token (for privte repos):
->?token=<your_token>
+## Query Params
 
-HTML formatted:
->?html
+### ?token=<your_token>
 
-Full JSON model:
->?json
+GitHub personal access token (for private repos).
+
+### ?html
+
+HTML formatted changelog.
+
+### ?json
+
+Get the full JSON [model](https://github.com/levithomason/github-changelog-api/blob/master/server/Models.js)
+including id, timestamps, user, repo, markdown, and html.
 
 ## Contribute
 

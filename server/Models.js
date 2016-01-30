@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
-import Promise from 'bluebird'
-import {COLLECTION_CHANGELOGS, MONGODB_URI} from './Config'
+import {MONGODB_URI} from './Config'
 
 const options = {
   server: {
