@@ -20,7 +20,15 @@ Generates a changelog to date, overwriting any previous.
 >https://github-changelog-api.herokuapp.com/:user/:repo  
 >**Response:** Markdown
 
+### Private Repo?
+
+[Generate a token here](https://github.com/settings/tokens/new?description=GitHub%20Changelog%20API%20token)
+and pass it as a query param `?token=<your_token>`.  This will skip storage and cache as well.
+
 ### Query Params
+
+GitHub Token (for privte repos):
+>?token=<your_token>
 
 HTML formatted:
 >?html

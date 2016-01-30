@@ -16,8 +16,13 @@ mongoose.connect(MONGODB_URI, options)
 //
 // Changelog
 //
-export const ChangelogModel = mongoose.model('Changelog', {
+const ChangelogSchema = new mongoose.Schema({
   user: String,
   repo: String,
-  contents: String,
-});
+  md: String,
+  html: String,
+}, {
+  timestamps: true
+})
+
+export const ChangelogModel = mongoose.model('Changelog', ChangelogSchema)
