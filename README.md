@@ -36,17 +36,11 @@ Payload: `{ data: 'The Changelog string', error: new Error() }`
 ## Private Repo?
 
 [Generate a token here](https://github.com/settings/tokens/new?description=GitHub%20Changelog%20API%20token)
-and pass it as a query param `?token=<your_token>`.  This will skip storage and cache as well.
+and pass it as a query param.
 
 ```bash
-curl -X POST github-changelog-api.herokuapp.com/:user/:repo?token=123 > CHANGELOG.md
+curl -X POST github-changelog-api.herokuapp.com/:user/:repo?token=123
 ```
-
-## Query Params
-
-### ?token=<your_token>
-
-GitHub personal access token (for private repos).
 
 ## Contribute
 
