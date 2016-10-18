@@ -12,13 +12,26 @@ I use it for CI/CD.
 curl -X POST github-changelog-api.herokuapp.com/:user/:repo
 ```
 
-### Get Changelog
+### Poll for results
 
-Poll the endpoint and check the response
+Poll the endpoint and check the response.
 
 ```bash
 curl github-changelog-api.herokuapp.com/:user/:repo
 ```
+
+#### Not Yet Complete
+Response: **302**  
+Payload: `{ data: null, error: null }`  
+Headers: `{ Retry-After: 5 }`  
+
+#### On Complete
+Response: **200**  
+Payload: `{ data: 'The Changelog string', error: null }`  
+
+#### On Error
+Response: **400**  
+Payload: `{ data: 'The Changelog string', error: new Error() }`  
 
 ## Private Repo?
 

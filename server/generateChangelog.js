@@ -20,11 +20,12 @@ const mkdir = (absPath) => new Promise((resolve, reject) => {
 })
 
 const generate = (ghPath, relPath, token) => new Promise((resolve, reject) => {
-  console.log(`...GENERATING CHANGELOG: ${ghPath} in ${relPath}`)
-
+  const response = { code: null, data: null, error: null, ghPath, relPath, token }
   const command = 'github_changelog_generator'
   const args = [ghPath]
   if (token) args.concat(['-t', token])
+
+  console.log(`...GENERATING CHANGELOG: for ${ghPath} with \`${command} ${args.join(' ')}\` in ${relPath}`)
 
   const child = spawn(command, args, { cwd: relPath })
 
@@ -34,26 +35,34 @@ const generate = (ghPath, relPath, token) => new Promise((resolve, reject) => {
 
   child.stderr.on('data', (data) => {
     console.error(`ERR --> ${ghPath}: ${data}`)
-    reject(data)
+    // buildup the error
+    if (response.error === null) {
+      response.error = data
+    } else {
+      response.error += data
+    }
   })
 
   child.on('close', (code) => {
     console.log(`${ghPath} exited code ${code}`)
-    const response = { code, data: null, error: null, ghPath, relPath, token }
+    response.code = code
 
     if (code === 0) {
       try {
-        resolve(Object.assign({}, response, {
-          data: fs.readFileSync(`${PROJECT_ROOT}/${CHANGELOG_DIR}/${ghPath}/CHANGELOG.md`, 'utf8')
-        }))
+        response.data = fs.readFileSync(`${PROJECT_ROOT}/${CHANGELOG_DIR}/${ghPath}/CHANGELOG.md`, 'utf8')
+        resolve(response)
       } catch (error) {
         error.message = [
           `Could not generate changelog for /${ghPath}. `,
           `Ensure the repo exists. If it's private, please use a valid access token. `,
-          error.message
+          (response.error ? `\n\nSTDOUT: ${response.error}` : ''),
+          '\n\nERROR MESSAGE:',
+          error.message,
         ].join('')
 
-        reject(Object.assign({}, response, { error }))
+        response.error = error
+
+        reject(response)
       }
     } else {
       reject(response)
