@@ -60,7 +60,7 @@ const generate = (ghPath, relPath, token) => new Promise((resolve, reject) => {
           error.message,
         ].join('')
 
-        response.error = error
+        response.error = error.toString()
 
         reject(response)
       }
