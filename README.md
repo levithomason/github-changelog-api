@@ -6,16 +6,18 @@ I use it for CI/CD.
 
 ## Usage
 
-### Create
+### Create Job
 
 ```bash
-curl -X POST github-changelog-api.herokuapp.com/:user/:repo > CHANGELOG.md
+curl -X POST github-changelog-api.herokuapp.com/:user/:repo
 ```
 
-### Retrieve
+### Get Changelog
+
+Poll the endpoint and check the response
 
 ```bash
-curl github-changelog-api.herokuapp.com/:user/:repo > CHANGELOG.md
+curl github-changelog-api.herokuapp.com/:user/:repo
 ```
 
 ## Private Repo?

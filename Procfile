@@ -1,1 +1,1 @@
-web: $(npm bin)/babel-node -- server/index.js
+web: node server/index.js
