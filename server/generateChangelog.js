@@ -22,8 +22,8 @@ const mkdir = (absPath) => new Promise((resolve, reject) => {
 const generate = (ghPath, relPath, token) => new Promise((resolve, reject) => {
   const response = { code: null, data: null, error: null, ghPath, relPath, token }
   const command = 'github_changelog_generator'
-  const args = [ghPath]
-  if (token) args.concat(['-t', token])
+  let args = [ghPath]
+  if (token) args = [...args, '-t', token]
 
   console.log(`...GENERATING CHANGELOG: for ${ghPath} with \`${command} ${args.join(' ')}\` in ${relPath}`)
 
