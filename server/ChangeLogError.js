@@ -1,4 +1,4 @@
-export default class ChangeLogError extends Error {
+module.exports = class ChangeLogError extends Error {
   constructor(message = 'Error generating the changelog', error = {}) {
     super()
     this.name = 'ChangeLogError';

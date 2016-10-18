@@ -4,44 +4,18 @@
   "description": "Changelog generator API for GitHub projects.",
   "main": "dist/index.html",
   "scripts": {
-    "clean": "while read line; do rm -rf $line; done < .gitignore",
-    "stop": "npm run mongo:stop & npm run redis:stop",
-    "prestart": "npm run mongo:start && npm run redis:start",
-    "start": "nodemon --exec babel-node -- server/index.js",
-    "premongo:start": "npm run mongo:stop",
-    "mongo:start": "mkdir -p ./db && mongod --dbpath ./db --fork --logpath /dev/null",
-    "mongo:stop": "mongo admin --eval 'db.shutdownServer()' > /dev/null 2>&1 || exit 0",
-    "preredis:start": "npm run redis:stop",
-    "redis:start": "bash ./scripts/subshell_redis.sh",
-    "redis:stop": "redis-cli shutdown > /dev/null 2>&1 || exit 0"
+    "start": "nodemon --exec node -- server/index.js"
   },
   "engines": {
-    "node": "5.1.0",
-    "npm": "3.3.12"
+    "node": "6",
+    "npm": "3"
   },
   "author": "Levi Thomason <me@levithomason.com>",
   "license": "MIT",
   "dependencies": {
-    "babel-cli": "^6.2.0",
-    "babel-core": "^6.2.1",
-    "babel-loader": "^6.2.0",
-    "babel-preset-es2015": "^6.1.18",
-    "babel-preset-react": "^6.1.18",
-    "babel-preset-stage-0": "^6.1.18",
-    "babel-register": "^6.2.0",
-    "bluebird": "^3.0.6",
     "express": "^4.13.3",
-    "history": "^1.13.0",
-    "html-webpack-plugin": "^1.6.2",
-    "marked": "^0.3.5",
-    "mongoose": "^4.2.9",
+    "fs-promise": "^0.5.0",
     "morgan": "^1.6.1",
-    "nodemon": "^1.8.1",
-    "react": "^0.14.0",
-    "react-dom": "^0.14.2",
-    "react-hot-loader": "^1.3.0",
-    "redis": "^2.4.2",
-    "webpack": "^1.12.8",
-    "webpack-dev-server": "^1.12.1"
+    "nodemon": "^1.8.1"
   }
 }

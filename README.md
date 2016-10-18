@@ -46,9 +46,6 @@ including id, timestamps, user, repo, markdown, and html.
 
 ### Setup
 
-You'll need [MongoDB](https://docs.mongodb.org/manual/installation/) and [Redis](http://redis.io/) to run locally. 
-
-1. `brew install mongodb redis`
 1. `npm install`
 1. `npm start`
 
