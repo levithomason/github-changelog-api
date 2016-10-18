@@ -48,15 +48,6 @@ curl -X POST github-changelog-api.herokuapp.com/:user/:repo?token=123 > CHANGELO
 
 GitHub personal access token (for private repos).
 
-### ?html
-
-HTML formatted changelog.
-
-### ?json
-
-Get the full JSON [model](https://github.com/levithomason/github-changelog-api/blob/master/server/Models.js)
-including id, timestamps, user, repo, markdown, and html.
-
 ## Contribute
 
 ### Setup
