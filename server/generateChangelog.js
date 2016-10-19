@@ -92,7 +92,7 @@ exports.generateChangelog = function generateChangelog(user, repo, options) {
     [repo]: { data: null, error: null }
   }
 
-  return mkdir(`${PROJECT_ROOT}/${user}/${repo}`)
+  return mkdir(`${PROJECT_ROOT}/changelogs/${user}/${repo}`)
     .then(() => generate(user, repo, { token, maxIssues }))
     .then(res => {
       exports.jobs[user][repo] = res

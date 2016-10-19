@@ -23,12 +23,14 @@
   <!-- App -->
   <script type="text/babel">
     const {
-      Label,
+      Button,
       Container,
       Divider,
       Form,
       Header,
+      Icon,
       Input,
+      Label,
       Message,
       Segment,
     } = semanticUIReact
@@ -40,18 +42,19 @@
       }
 
       componentWillMount() {
-        console.log(this.props)
         this.generate()
       }
 
-      state = {}
+      state = {
+        viewHTML: true,
+      }
 
       getChangelogUrl = () => {
         console.debug('getChangelogUrl()')
         const { userRepo, token } = this.props
-        let url = `/${userRepo}`
-        if (token) url += `?token=${token}`
-        console.log(url)
+        let url = `/${userRepo}?maxIssues=50`
+        if (token) url += `&token=${token}`
+
         return url
       }
 
@@ -102,34 +105,57 @@
 
       toggleView = () => this.setState({ viewHTML: !this.state.viewHTML })
 
+      remove = () => {
+        const { onRemove, userRepo } = this.props
+        if (onRemove) onRemove(userRepo)
+      }
+
       render() {
-        const { token, userRepo } = this.props
+        const { userRepo } = this.props
         const { viewHTML, changelog, error, loading } = this.state
 
+        const iconStyle = {
+          position: 'absolute',
+          top: '0.4em',
+          right: '0.1em',
+        }
         return (
           <Segment.Group>
             <Segment secondary>
               <Header>
-                <a href={`https://github.com/${userRepo}`} target='_blank'>{userRepo}</a>
-                {token && <Header.Subheader>{token}</Header.Subheader>}
+                <a href={`https://github.com/${userRepo}`} target='_blank'>
+                  <Icon name='github' /> {userRepo}
+                </a>
               </Header>
+              <Icon name='remove' color='grey' size='large' link onClick={this.remove} style={iconStyle} />
             </Segment>
             <Segment>
-              <Label
-                as='a'
-                basic
-                icon='eye'
-                attached='top right'
-                content={viewHTML ? 'Markdown' : 'HTML'}
-                onClick={this.toggleView}
-              />
-              {error && (
-                <Message
-                  error
-                  icon='warning circle'
-                  header='Uh-oh!'
-                  content={error.split('\n').map((l, i) => (<span key={i}>{l}<br /></span>))}
+              {!error && !loading && (
+                <Label
+                  as='a'
+                  basic
+                  icon='eye'
+                  attached='top right'
+                  content={viewHTML ? 'Markdown' : 'HTML'}
+                  onClick={this.toggleView}
                 />
+              )}
+              {error && (
+                <Message error icon>
+                  <Icon name='warning circle' />
+                  <Message.Content>
+                    <Message.Header>Uh-oh!</Message.Header>
+                    <p>
+                      {error
+                        .split('\n')
+                        .filter(l => !!l)
+                        .map((l, i) => (<span key={i}>{l}<br /></span>))
+                      }
+                    </p>
+                    <Button compact basic negative onClick={this.generate}>Retry</Button>
+                    <Button compact basic negative onClick={this.remove}>Remove</Button>
+                  </Message.Content>
+                </Message>
               )}
               {loading && (
                 <div>
@@ -154,9 +180,14 @@
 
     class App extends React.Component {
       state = {
-        userRepo: 'dev-coop/anny',
-        token: '61255574a63a91677590678e6731d26f5eb961e3',
+        userRepo: localStorage.userRepo || '',
+        token: localStorage.token || '',
         changelogs: [],
+      }
+
+      componentDidUpdate(prevProps, prevState) {
+        localStorage.userRepo = this.state.userRepo
+        localStorage.token = this.state.token
       }
 
       handleUserRepoChange = (e) => this.setState({ hasSubmitted: false, userRepo: e.target.value })
@@ -175,10 +206,20 @@
           return
         }
 
+        let changelogs
+        if (!this.state.changelogs.find(changelog => changelog.userRepo === userRepo)) {
+          changelogs = [{ userRepo, token }, ...this.state.changelogs]
+        }
+
+        this.setState({ error: '', changelogs })
+      }
+
+      handleRemoveChangelog = (userRepo) => {
+        const { changelogs } = this.state
         this.setState({
-          userRepo: '',
-          error: '',
-          changelogs: [...this.state.changelogs, { userRepo, token }]
+          changelogs: changelogs.filter(changelog => {
+            return changelog.userRepo !== userRepo
+          })
         })
       }
 
@@ -187,7 +228,12 @@
         return (
           <Container>
             <Divider hidden fitted />
-            <Header as='h1' dividing>Github Changelog API</Header>
+            <Header as='h1' dividing>
+              Github Changelog API &mdash;{' '}
+              <a href="https://github.com/levithomason/github-changelog-api">
+                GitHub <Icon name='github' />
+              </a>
+            </Header>
 
             <Form onSubmit={this.handleSubmit}>
               <Form.Group widths='equal'>
@@ -209,21 +255,23 @@
                     href="https://github.com/settings/tokens/new?description=GitHub%20Changelog%20API%20token"
                     target="_blank"
                   >
-                    Get it on GitHub
+                    Make one
                   </a>
                 </Form.Field>
                 <Form.Button width={3} primary content='Generate' />
               </Form.Group>
             </Form>
-            <Divider />
+            <Divider hidden />
 
             {error && (
               <Message error icon='warning circle' header='Uh-oh!' content={error} />
             )}
 
-            {changelogs.map(({ userRepo, token }) => (
-              <Changelog key={userRepo} userRepo={userRepo} token={token} />
-            ))}
+            {changelogs.length > 0 ? changelogs.map(({ userRepo, token }) => (
+              <Changelog key={userRepo} userRepo={userRepo} token={token} onRemove={this.handleRemoveChangelog} />
+            )) : (
+              <Message>This demo fetches with `<code>maxIssues=50</code>`, for brevity.</Message>
+            )}
           </Container>
         )
       }
