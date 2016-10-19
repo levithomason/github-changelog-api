@@ -1,8 +1,9 @@
-GitHub Changelog API
-====================
+# [GitHub Changelog API][1]
 
 An API for generating a changelog with the excellent [GitHub Changelog Generator](https://github.com/skywinder/github-changelog-generator).
 I use it for CI/CD.
+
+### [Try the Demo][1]
 
 ## Usage
 
@@ -26,25 +27,25 @@ curl github-changelog-api.herokuapp.com/:user/:repo
 
 Continue polling until you receive a complete or error response.
 
-|Status   | Payload                         | Headers             |
-|---------|---------------------------------|---------------------|
-|**302**  | `{ data: null, error: null }`   | `{ Retry-After: 5 }`| 
+|Status   | Payload            | Headers             |
+|---------|--------------------|---------------------|
+|**302**  | `In progress...`   | `{ Retry-After: 5 }`| 
 
 #### Complete
 
 Save the payload `data` as your changelog.
 
-|Status   | Payload                                    | Headers    |
-|---------|--------------------------------------------|------------|
-|**200**  | `{ data: 'The Changelog', error: null }`   |            | 
+|Status   | Payload           |
+|---------|-------------------|
+|**200**  | `The changelog`   | 
 
 #### Error
 
 Something went wrong, consult the payload `error`.
 
-|Status   | Payload                               | Headers    |
-|---------|---------------------------------------|------------|
-|**400**  | `{ data: null, error: 'Some error' }` |            | 
+|Status   | Payload            |
+|---------|--------------------|
+|**400**  | `An error message` | 
 
 ## Private Repo?
 
@@ -54,6 +55,15 @@ and pass it as a query param.
 ```bash
 curl -X POST github-changelog-api.herokuapp.com/:user/:repo?token=123
 ```
+## Query Params
+
+### ?token=<string>
+
+Add a GitHub personal access token for access to private repos and a higher rate limit.
+
+### ?maxIssues=<number>
+
+Limit the number of issues fetched.  Useful for avoiding rate limits and lengthy changelog generation times.
 
 ## Contribute
 
@@ -75,3 +85,5 @@ npm restart     # stop / start
 ## Credits
 
 [skywinder/github-changelog-generator](https://github.com/skywinder/github-changelog-generator)
+
+[1]: http://github-changelog-api.herokuapp.com 

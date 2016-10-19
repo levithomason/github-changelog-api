@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link
+    rel="stylesheet"
+    href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.css"
+  >
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.2/axios.min.js"></script>
+  <script
+    src="//cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.14.0/babel.min.js"
+    data-presets="es2015,react,stage1"
+  ></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.3.2/react-dom.js"></script>
+  <script src="//unpkg.com/semantic-ui-react/dist/umd/semantic-ui-react.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/marked/0.3.6/marked.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- App -->
+  <script type="text/babel">
+    const {
+      Label,
+      Container,
+      Divider,
+      Form,
+      Header,
+      Input,
+      Message,
+      Segment,
+    } = semanticUIReact
+
+    class Changelog extends React.Component {
+      static propTypes = {
+        userRepo: React.PropTypes.string.isRequired,
+        token: React.PropTypes.string,
+      }
+
+      componentWillMount() {
+        console.log(this.props)
+        this.generate()
+      }
+
+      state = {}
+
+      getChangelogUrl = () => {
+        console.debug('getChangelogUrl()')
+        const { userRepo, token } = this.props
+        let url = `/${userRepo}`
+        if (token) url += `?token=${token}`
+        console.log(url)
+        return url
+      }
+
+      generate = () => {
+        console.debug('generate()')
+        return axios.post(this.getChangelogUrl())
+          .then(res => {
+            this.setState({
+              changelog: '',
+              error: '',
+              loading: true,
+            })
+            this.fetch()
+          }, err => {
+            this.setState({
+              loading: false,
+              statusCode: err.response.status,
+              error: err.response.data,
+            })
+          })
+      }
+
+      fetch = () => {
+        console.debug('fetch()')
+        return axios.get(this.getChangelogUrl())
+          .then(res => {
+            console.log('fetch() success', res)
+            this.setState({
+              loading: false,
+              changelog: res.data,
+            })
+          }, err => {
+            if (err.response.status === 302) {
+              console.log('fetch() 302')
+              setTimeout(() => {
+                this.fetch()
+              }, 2000)
+            } else {
+              console.log('fetch() error', err.response)
+              this.setState({
+                loading: false,
+                statusCode: err.response.status,
+                error: err.response.data,
+              })
+            }
+          })
+      }
+
+      toggleView = () => this.setState({ viewHTML: !this.state.viewHTML })
+
+      render() {
+        const { token, userRepo } = this.props
+        const { viewHTML, changelog, error, loading } = this.state
+
+        return (
+          <Segment.Group>
+            <Segment secondary>
+              <Header>
+                <a href={`https://github.com/${userRepo}`} target='_blank'>{userRepo}</a>
+                {token && <Header.Subheader>{token}</Header.Subheader>}
+              </Header>
+            </Segment>
+            <Segment>
+              <Label
+                as='a'
+                basic
+                icon='eye'
+                attached='top right'
+                content={viewHTML ? 'Markdown' : 'HTML'}
+                onClick={this.toggleView}
+              />
+              {error && (
+                <Message
+                  error
+                  icon='warning circle'
+                  header='Uh-oh!'
+                  content={error.split('\n').map((l, i) => (<span key={i}>{l}<br /></span>))}
+                />
+              )}
+              {loading && (
+                <div>
+                  <Message
+                    info
+                    icon='notched circle loading'
+                    header='Generating...'
+                    content='Depending on the number of issues and PRs, this can take a while.'
+                  />
+                </div>
+              )}
+              {changelog && (
+                viewHTML
+                  ? <div dangerouslySetInnerHTML={{ __html: marked(changelog) }} />
+                  : <pre><code>{changelog}</code></pre>
+              )}
+            </Segment>
+          </Segment.Group>
+        )
+      }
+    }
+
+    class App extends React.Component {
+      state = {
+        userRepo: 'dev-coop/anny',
+        token: '61255574a63a91677590678e6731d26f5eb961e3',
+        changelogs: [],
+      }
+
+      handleUserRepoChange = (e) => this.setState({ hasSubmitted: false, userRepo: e.target.value })
+
+      handleTokenChange = (e) => this.setState({ hasSubmitted: false, token: e.target.value })
+
+      handleSubmit = (e, data) => {
+        const { changelog, token, userRepo } = this.state
+        console.debug('handleSubmit()')
+        e.preventDefault()
+
+        if (!userRepo) {
+          this.setState({
+            error: 'You need to provide a GitHub user/repo to generate a changelog',
+          })
+          return
+        }
+
+        this.setState({
+          userRepo: '',
+          error: '',
+          changelogs: [...this.state.changelogs, { userRepo, token }]
+        })
+      }
+
+      render() {
+        const { changelogs, error, token, userRepo } = this.state
+        return (
+          <Container>
+            <Divider hidden fitted />
+            <Header as='h1' dividing>Github Changelog API</Header>
+
+            <Form onSubmit={this.handleSubmit}>
+              <Form.Group widths='equal'>
+                <Form.Input
+                  name='userRepo'
+                  placeholder='User/Repo'
+                  onChange={this.handleUserRepoChange}
+                  value={userRepo}
+                />
+                <Form.Field>
+                  <Input
+                    name='token'
+                    placeholder='Personal Access Token'
+                    onChange={this.handleTokenChange}
+                    value={token}
+                  />
+                  <a
+                    style={{ float: 'right', fontSize: '0.9em' }}
+                    href="https://github.com/settings/tokens/new?description=GitHub%20Changelog%20API%20token"
+                    target="_blank"
+                  >
+                    Get it on GitHub
+                  </a>
+                </Form.Field>
+                <Form.Button width={3} primary content='Generate' />
+              </Form.Group>
+            </Form>
+            <Divider />
+
+            {error && (
+              <Message error icon='warning circle' header='Uh-oh!' content={error} />
+            )}
+
+            {changelogs.map(({ userRepo, token }) => (
+              <Changelog key={userRepo} userRepo={userRepo} token={token} />
+            ))}
+          </Container>
+        )
+      }
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'))
+  </script>
+</body>
+</html>

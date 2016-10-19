@@ -1,8 +1,8 @@
 const express = require('express')
 const morgan = require('morgan')
+const path = require('path')
 
 const { generateChangelog } = require('./generateChangelog')
-const ChangeLogError = require('./ChangeLogError')
 const app = express()
 
 app
@@ -10,35 +10,47 @@ app
     skip: (req, res) => !!req.url.match('/socket.io')
   }))
 
+  .get('/', (req, res) => {
+    res.sendFile(path.resolve('app/index.html'))
+  })
+
   .get('/:user/:repo', (req, res) => {
-    const { completedJobs } = require('./generateChangelog')
+    const { jobs } = require('./generateChangelog')
     const { user, repo } = req.params
+    const job = jobs[user] && jobs[user][repo]
 
-    if (!(completedJobs[user] && completedJobs[user][repo])) {
-      res.status(404).send(`There is no job for ${user}/${repo}.  Make a POST first.`)
-    } else {
-      // set status
-      if (completedJobs[user][repo].error) {
-        res.status(400)
-      } else if (!completedJobs[user][repo].data) {
-        res.status(302).setHeader('Retry-After', 5)
-      }
+    if (!job)      return res.status(404).send(`There is no job for ${user}/${repo}.  Make a POST first.`)
+    if (job.error) return res.status(400).send(job.error)
+    if (!job.data) return res.status(302).set('Retry-After', 5).send('Working, try again in 5s.')
 
-      res.json(completedJobs[user][repo])
-    }
+    res.send(job.data)
   })
 
   .post('/:user/:repo', (req, res) => {
     const { user, repo } = req.params
-    const { token } = req.query
+    const { token, maxIssues } = req.query
 
-    generateChangelog(user, repo, token)
+    generateChangelog(user, repo, { token, maxIssues })
 
-    res.status(200).send('ok')
+    res.status(200).send([
+      `Started a job for ${user}/${repo}. `,
+      'Poll with a GET to check status and retrieve the changelog.'
+    ].join(''))
+  })
+
+  .get('/jobs', (req, res) => {
+    const { jobs } = require('./generateChangelog')
+    res.json(jobs)
   })
 
   .all('*', (req, res) => {
-    res.status(400).json(new ChangeLogError(`Bad url parameters, usage: /:user/:repo`))
+    res.status(404).send([
+      'Bad url parameters.',
+      '',
+      'Usage:',
+      '  Create a changelog - POST /:user/:repo',
+      '  Retrieve a changelog - GET /:user/:repo',
+    ].join('\n'))
   })
 
 const server = app.listen(process.env.PORT || 3000, () => {
