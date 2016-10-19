@@ -195,7 +195,7 @@
       handleTokenChange = (e) => this.setState({ hasSubmitted: false, token: e.target.value })
 
       handleSubmit = (e, data) => {
-        const { changelog, token, userRepo } = this.state
+        const { token, userRepo } = this.state
         console.debug('handleSubmit()')
         e.preventDefault()
 
@@ -206,9 +206,9 @@
           return
         }
 
-        let changelogs
-        if (!this.state.changelogs.find(changelog => changelog.userRepo === userRepo)) {
-          changelogs = [{ userRepo, token }, ...this.state.changelogs]
+        let changelogs = [...this.state.changelogs]
+        if (!changelogs.find(changelog => changelog.userRepo === userRepo)) {
+          changelogs = [{ userRepo, token }, ...changelogs]
         }
 
         this.setState({ error: '', changelogs })
