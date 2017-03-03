@@ -74,13 +74,9 @@ Limit the number of issues fetched.  Useful for avoiding rate limits and lengthy
 
 ### Dev Process
 
-```
-npm run         # help
-
-npm start       # start server and background services
-npm stop        # stop all background services
-npm restart     # stop / start
-```
+1. `npm start` to start the server
+1. Hack on `/server` to change the API
+1. Hack on `/app` to change the demo app
 
 ## Credits
 
