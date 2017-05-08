@@ -1,5 +1,7 @@
 # [GitHub Changelog API][1]
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/levithomason/github-changelog-api.svg)](https://greenkeeper.io/)
+
 An API for generating a changelog with the excellent [GitHub Changelog Generator](https://github.com/skywinder/github-changelog-generator).
 I use it for CI/CD.
 
