@@ -1,6 +1,7 @@
 const { spawn } = require('child_process')
 const fs = require('fs-promise')
 const { CHANGELOG_DIR, PROJECT_ROOT } = require('./Config')
+const { reduce, kebabCase } = require('lodash')
 
 // tracks open changelog jobs
 exports.jobs = {
@@ -18,15 +19,18 @@ const mkdir = (absPath) => new Promise((resolve, reject) => {
 })
 
 const generate = (user, repo, options) => new Promise((resolve, reject) => {
-  const { token, maxIssues } = options
   const ghPath = `${user}/${repo}`
   const relPath = `${CHANGELOG_DIR}/${ghPath}`
 
   const command = 'github_changelog_generator'
-  let args = [ghPath]
-  if (token) args = [...args, '-t', token]
-  if (maxIssues) args = [...args, '--max-issues', maxIssues]
-  const prettyCommand = `\`${command} ${args.join(' ')}\``
+
+  const args = reduce(
+    options,
+    (memo, value, key) => (memo += ` --${kebabCase(key)} ${value}`),
+    `${ghPath}`
+  )
+
+  const prettyCommand = `\`${command} ${args}\``
 
   console.log(`...GENERATING CHANGELOG: for ${ghPath} with ${prettyCommand} in ${relPath}`)
 
@@ -81,19 +85,16 @@ const generate = (user, repo, options) => new Promise((resolve, reject) => {
  * Generate a changelog for a given GitHub user/repo.
  * @param {string} user The GitHub username
  * @param {string} repo The GitHub repo name
- * @param {string} [options]
- * @param {string} [options.token] A Github access token
- * @param {string} [options.maxIssues] The maximum number of issues to fetch
+ * @param {Object} [options]
  * @returns {Promise}
  */
 exports.generateChangelog = function generateChangelog(user, repo, options) {
-  const { token, maxIssues } = options
   exports.jobs[user] = {
     [repo]: { data: null, error: null }
   }
 
   return mkdir(`${PROJECT_ROOT}/changelogs/${user}/${repo}`)
-    .then(() => generate(user, repo, { token, maxIssues }))
+    .then(() => generate(user, repo, options))
     .then(res => {
       exports.jobs[user][repo] = res
     })

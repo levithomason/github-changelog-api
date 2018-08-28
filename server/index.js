@@ -28,9 +28,9 @@ app
 
   .post('/:user/:repo', (req, res) => {
     const { user, repo } = req.params
-    const { token, maxIssues } = req.query
+    const options = req.query
 
-    generateChangelog(user, repo, { token, maxIssues })
+    generateChangelog(user, repo, options)
 
     res.status(200).send([
       `Started a job for ${user}/${repo}. `,
