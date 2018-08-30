@@ -55,15 +55,14 @@ and pass it as a query param.
 ```bash
 curl -X POST github-changelog-api.herokuapp.com/:user/:repo?token=123
 ```
+
 ## Query Params
 
-### ?token=<string>
+All [`github-changelog-generator` additional options](https://github.com/github-changelog-generator/github-changelog-generator/wiki/Advanced-change-log-generation-examples#additional-options) are supported via camel cased query params. For example:
 
-Add a GitHub personal access token for access to private repos and a higher rate limit.
-
-### ?maxIssues=<number>
-
-Limit the number of issues fetched.  Useful for avoiding rate limits and lengthy changelog generation times.
+- `--filter-by-milestone` => `?filterByMilestone=true`
+- `--header-label "# Changelog"` => `?headerLabel=%22%23%20Changelog%22`
+- `--future-release v5.0.21` => `?futureRelease=v5.0.21`
 
 ## Contribute
 
